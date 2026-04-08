@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SAIM • Student Assistant</title>
+    <style>
+      :root {
+        --bg: #08090f;
+        --panel: rgba(20, 24, 44, 0.75);
+        --panel-border: rgba(127, 143, 255, 0.35);
+        --accent: #86a8ff;
+        --accent-2: #8d7bff;
+        --text: #f5f7ff;
+        --muted: #b4bfef;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: Inter, "Segoe UI", Roboto, Arial, sans-serif;
+        color: var(--text);
+        background: radial-gradient(circle at top left, #2f2a6d, transparent 38%),
+          radial-gradient(circle at top right, #1d4f7f, transparent 42%),
+          radial-gradient(circle at bottom, #3a1c54, transparent 45%), var(--bg);
+      }
+
+      .wrapper {
+        width: min(1100px, 92vw);
+        margin: 32px auto;
+        display: grid;
+        gap: 20px;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      }
+
+      .panel {
+        background: var(--panel);
+        border: 1px solid var(--panel-border);
+        border-radius: 18px;
+        backdrop-filter: blur(10px);
+        box-shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
+      }
+
+      .hero {
+        padding: 28px;
+      }
+
+      .hero h1 {
+        margin: 0;
+        font-size: clamp(1.8rem, 4vw, 2.6rem);
+        line-height: 1.2;
+      }
+
+      .hero .glow {
+        background: linear-gradient(135deg, #dce6ff, #aab8ff 40%, #d0b5ff);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      }
+
+      .hero p {
+        margin: 14px 0 0;
+        color: var(--muted);
+        line-height: 1.6;
+      }
+
+      .filters {
+        margin-top: 20px;
+        display: grid;
+        gap: 12px;
+        grid-template-columns: repeat(2, minmax(120px, 1fr));
+      }
+
+      .field {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .field span {
+        font-size: 0.85rem;
+        color: #c9d2ff;
+      }
+
+      select {
+        border: 1px solid rgba(164, 177, 255, 0.45);
+        background: rgba(10, 14, 30, 0.8);
+        color: var(--text);
+        padding: 10px;
+        border-radius: 10px;
+        outline: none;
+      }
+
+      .chat {
+        min-height: 68vh;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+
+      .chat-head {
+        padding: 18px 20px;
+        border-bottom: 1px solid rgba(140, 153, 250, 0.25);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .chat-head h2 {
+        margin: 0;
+        font-size: 1.1rem;
+      }
+
+      .messages {
+        flex: 1;
+        overflow-y: auto;
+        padding: 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .msg {
+        max-width: 85%;
+        padding: 10px 12px;
+        border-radius: 12px;
+        line-height: 1.4;
+      }
+
+      .msg.bot {
+        align-self: flex-start;
+        background: rgba(134, 168, 255, 0.2);
+        border: 1px solid rgba(134, 168, 255, 0.3);
+      }
+
+      .msg.user {
+        align-self: flex-end;
+        background: linear-gradient(130deg, var(--accent), var(--accent-2));
+        color: #f8faff;
+      }
+
+      .chat-bar {
+        border-top: 1px solid rgba(140, 153, 250, 0.25);
+        padding: 14px;
+        background: rgba(7, 11, 24, 0.88);
+      }
+
+      .composer {
+        display: flex;
+        gap: 10px;
+      }
+
+      .composer input {
+        flex: 1;
+        border-radius: 999px;
+        border: 1px solid rgba(164, 177, 255, 0.45);
+        background: rgba(20, 23, 42, 0.9);
+        color: var(--text);
+        padding: 11px 14px;
+        outline: none;
+      }
+
+      .composer button {
+        border: 0;
+        border-radius: 999px;
+        background: linear-gradient(130deg, var(--accent), var(--accent-2));
+        color: white;
+        padding: 11px 18px;
+        font-weight: 600;
+        cursor: pointer;
+      }
+
+      @media (max-width: 760px) {
+        .filters {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="wrapper">
+      <section class="panel hero">
+        <h1>Meet <span class="glow">SAIM</span>, your artistic campus companion.</h1>
+        <p>
+          Ask questions, revise smarter, and stay ready for every assessment with a vibrant
+          student-first learning space.
+        </p>
+
+        <div class="filters" aria-label="Student profile selectors">
+          <label class="field">
+            <span>Year</span>
+            <select id="year">
+              <option value="1st Year">1st Year</option>
+              <option value="2nd Year">2nd Year</option>
+              <option value="3rd Year">3rd Year</option>
+              <option value="4th Year">4th Year</option>
+            </select>
+          </label>
+
+          <label class="field">
+            <span>Trade</span>
+            <select id="trade">
+              <option value="Computer Science">Computer Science</option>
+              <option value="Information Technology">Information Technology</option>
+              <option value="Electronics">Electronics</option>
+              <option value="Mechanical">Mechanical</option>
+            </select>
+          </label>
+
+          <label class="field">
+            <span>Exam</span>
+            <select id="exam">
+              <option value="Minor 1">Minor 1</option>
+              <option value="Minor 2">Minor 2</option>
+              <option value="Major">Major</option>
+              <option value="Quiz 1">Quiz 1</option>
+              <option value="Quiz 2">Quiz 2</option>
+            </select>
+          </label>
+
+          <label class="field">
+            <span>Teacher</span>
+            <select id="teacher">
+              <option value="Prof. Sharma">Prof. Sharma</option>
+              <option value="Prof. Verma">Prof. Verma</option>
+              <option value="Prof. Iyer">Prof. Iyer</option>
+              <option value="Prof. Khan">Prof. Khan</option>
+            </select>
+          </label>
+        </div>
+      </section>
+
+      <section class="panel chat" aria-label="SAIM chat">
+        <header class="chat-head">
+          <h2>SAIM Chat</h2>
+          <small id="context" aria-live="polite"></small>
+        </header>
+
+        <div id="messages" class="messages" aria-live="polite">
+          <div class="msg bot" role="status">Hi! Tell me what topic you want to revise today.</div>
+        </div>
+
+        <div class="chat-bar">
+          <form id="chat-form" class="composer">
+            <input id="chat-input" type="text" placeholder="Type your question..." aria-label="Chat message" />
+            <button type="submit">Send</button>
+          </form>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      const chatForm = document.getElementById("chat-form");
+      const chatInput = document.getElementById("chat-input");
+      const messages = document.getElementById("messages");
+      const context = document.getElementById("context");
+      const year = document.getElementById("year");
+      const exam = document.getElementById("exam");
+      const trade = document.getElementById("trade");
+      const teacher = document.getElementById("teacher");
+      const MAX_MESSAGE_LENGTH = 500;
+
+      function updateContext() {
+        context.textContent = `${year.value} • ${trade.value} • ${exam.value} • ${teacher.value}`;
+      }
+
+      year.addEventListener("change", updateContext);
+      trade.addEventListener("change", updateContext);
+      exam.addEventListener("change", updateContext);
+      teacher.addEventListener("change", updateContext);
+      updateContext();
+
+      function cleanInputText(value) {
+        return value.replace(/[\x00-\x1F\x7F]/g, "").trim().slice(0, MAX_MESSAGE_LENGTH);
+      }
+
+      function buildProfileResponse() {
+        return `Got it. I will tailor this for ${year.value}, ${trade.value}, ${exam.value}, with ${teacher.value}.`;
+      }
+
+      function appendMessage(text, type) {
+        const node = document.createElement("div");
+        node.className = `msg ${type}`;
+        node.textContent = text;
+        if (type === "bot") {
+          node.setAttribute("role", "status");
+        }
+        messages.appendChild(node);
+        messages.scrollTop = messages.scrollHeight;
+      }
+
+      chatForm.addEventListener("submit", (event) => {
+        event.preventDefault();
+        const value = cleanInputText(chatInput.value);
+        if (!value) return;
+
+        appendMessage(value, "user");
+        appendMessage(buildProfileResponse(), "bot");
+        chatInput.value = "";
+      });
+    </script>
+  </body>
+</html>
