@@ -237,7 +237,7 @@
       <section class="panel chat" aria-label="SAIM chat">
         <header class="chat-head">
           <h2>SAIM Chat</h2>
-          <small id="context" aria-live="polite">1st Year • Computer Science • Minor 1 • Prof. Sharma</small>
+          <small id="context" aria-live="polite"></small>
         </header>
 
         <div id="messages" class="messages" aria-live="polite">
@@ -262,6 +262,7 @@
       const exam = document.getElementById("exam");
       const trade = document.getElementById("trade");
       const teacher = document.getElementById("teacher");
+      const MAX_MESSAGE_LENGTH = 500;
 
       function updateContext() {
         context.textContent = `${year.value} • ${trade.value} • ${exam.value} • ${teacher.value}`;
@@ -271,9 +272,14 @@
       trade.addEventListener("change", updateContext);
       exam.addEventListener("change", updateContext);
       teacher.addEventListener("change", updateContext);
+      updateContext();
 
       function cleanInputText(value) {
-        return value.replace(/[\x00-\x1F\x7F]/g, "").trim().slice(0, 500);
+        return value.replace(/[\x00-\x1F\x7F]/g, "").trim().slice(0, MAX_MESSAGE_LENGTH);
+      }
+
+      function buildProfileResponse() {
+        return `Got it. I will tailor this for ${year.value}, ${trade.value}, ${exam.value}, with ${teacher.value}.`;
       }
 
       function appendMessage(text, type) {
@@ -293,10 +299,7 @@
         if (!value) return;
 
         appendMessage(value, "user");
-        appendMessage(
-          `Got it. I will tailor this for ${year.value}, ${trade.value}, ${exam.value}, with ${teacher.value}.`,
-          "bot"
-        );
+        appendMessage(buildProfileResponse(), "bot");
         chatInput.value = "";
       });
     </script>
