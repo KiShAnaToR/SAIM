@@ -240,8 +240,8 @@
           <small id="context">1st Year • Computer Science • Minor 1 • Prof. Sharma</small>
         </header>
 
-        <div id="messages" class="messages">
-          <div class="msg bot">Hi! Tell me what topic you want to revise today.</div>
+        <div id="messages" class="messages" aria-live="polite">
+          <div class="msg bot" role="status">Hi! Tell me what topic you want to revise today.</div>
         </div>
 
         <div class="chat-bar">
@@ -272,21 +272,31 @@
       exam.addEventListener("change", updateContext);
       teacher.addEventListener("change", updateContext);
 
+      function sanitizeText(value) {
+        return value.replace(/[\x00-\x1F\x7F]/g, "").trim().slice(0, 500);
+      }
+
       function appendMessage(text, type) {
         const node = document.createElement("div");
         node.className = `msg ${type}`;
         node.textContent = text;
+        if (type === "bot") {
+          node.setAttribute("role", "status");
+        }
         messages.appendChild(node);
         messages.scrollTop = messages.scrollHeight;
       }
 
       chatForm.addEventListener("submit", (event) => {
         event.preventDefault();
-        const value = chatInput.value.trim();
+        const value = sanitizeText(chatInput.value);
         if (!value) return;
 
         appendMessage(value, "user");
-        appendMessage(`Got it. I will tailor this for ${year.value}, ${trade.value}, ${exam.value}, with ${teacher.value}.`, "bot");
+        appendMessage(
+          `Got it. I will tailor this for ${sanitizeText(year.value)}, ${sanitizeText(trade.value)}, ${sanitizeText(exam.value)}, with ${sanitizeText(teacher.value)}.`,
+          "bot"
+        );
         chatInput.value = "";
       });
     </script>
