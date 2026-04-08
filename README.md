@@ -69,7 +69,7 @@ RunPod gives the best price-to-performance ratio for training runs. Colab free t
 
 ### OCR — Tesseract (printed) + Google Vision API (handwritten)
 
-Use free Tesseract for typed/printed notes. For handwritten notes, Google Vision API gives the best accuracy at very low cost — approximately Rs. 1.20 per 1000 pages.
+Use free Tesseract for printed notes. For handwritten notes, Google Vision API gives the best accuracy at a very low cost — approximately Rs. 1.20 per 1000 pages.
 
 ### Local Dev LLM — Ollama
 
