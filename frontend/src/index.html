@@ -237,7 +237,7 @@
       <section class="panel chat" aria-label="SAIM chat">
         <header class="chat-head">
           <h2>SAIM Chat</h2>
-          <small id="context">1st Year • Computer Science • Minor 1 • Prof. Sharma</small>
+          <small id="context" aria-live="polite">1st Year • Computer Science • Minor 1 • Prof. Sharma</small>
         </header>
 
         <div id="messages" class="messages" aria-live="polite">
@@ -272,7 +272,7 @@
       exam.addEventListener("change", updateContext);
       teacher.addEventListener("change", updateContext);
 
-      function sanitizeText(value) {
+      function cleanInputText(value) {
         return value.replace(/[\x00-\x1F\x7F]/g, "").trim().slice(0, 500);
       }
 
@@ -289,12 +289,12 @@
 
       chatForm.addEventListener("submit", (event) => {
         event.preventDefault();
-        const value = sanitizeText(chatInput.value);
+        const value = cleanInputText(chatInput.value);
         if (!value) return;
 
         appendMessage(value, "user");
         appendMessage(
-          `Got it. I will tailor this for ${sanitizeText(year.value)}, ${sanitizeText(trade.value)}, ${sanitizeText(exam.value)}, with ${sanitizeText(teacher.value)}.`,
+          `Got it. I will tailor this for ${year.value}, ${trade.value}, ${exam.value}, with ${teacher.value}.`,
           "bot"
         );
         chatInput.value = "";
