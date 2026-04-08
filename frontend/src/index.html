@@ -246,7 +246,7 @@
 
         <div class="chat-bar">
           <form id="chat-form" class="composer">
-            <input id="chat-input" type="text" placeholder="Type your doubt..." aria-label="Chat message" />
+            <input id="chat-input" type="text" placeholder="Type your question..." aria-label="Chat message" />
             <button type="submit">Send</button>
           </form>
         </div>
@@ -286,7 +286,7 @@
         if (!value) return;
 
         appendMessage(value, "user");
-        appendMessage("Got it. I will tailor the response to your selected profile.", "bot");
+        appendMessage(`Got it. I will tailor this for ${year.value}, ${trade.value}, ${exam.value}, with ${teacher.value}.`, "bot");
         chatInput.value = "";
       });
     </script>
