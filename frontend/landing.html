@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="SAIM - Old-money styled AI study assistant with centered chat experience.">
+    <title>SAIM - AI Study Buddy</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #f5f1e8;
+            --paper: #fcf8ef;
+            --ink: #1f2a1f;
+            --muted: #5b6659;
+            --line: #d9ccb1;
+            --primary: #1f3a2e;
+            --primary-soft: #2d4a3d;
+            --accent: #b08a4a;
+            --accent-soft: #d6bf95;
+            --ai-bubble: #f3ecdd;
+            --user-bubble: #20392f;
+        }
+
+        body {
+            font-family: Georgia, "Times New Roman", serif;
+            min-height: 100vh;
+            color: var(--ink);
+            background:
+                radial-gradient(circle at 20% 20%, rgba(176, 138, 74, 0.15), transparent 40%),
+                radial-gradient(circle at 80% 10%, rgba(31, 58, 46, 0.12), transparent 35%),
+                linear-gradient(140deg, #f8f4eb, #f2ece0 48%, #ece3d4);
+            display: flex;
+            flex-direction: column;
+            padding: 0;
+        }
+
+        .page-shell {
+            width: 100%;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+
+        .top-controls {
+            padding: 0.9rem 1.25rem;
+            border-top: 1px solid var(--line);
+            border-bottom: 1px solid var(--line);
+            background: linear-gradient(180deg, rgba(251, 246, 236, 0.98), rgba(245, 237, 223, 0.98));
+            display: grid;
+            grid-template-columns: repeat(4, minmax(140px, 1fr));
+            gap: 0.55rem;
+        }
+
+        .chat-shell {
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+            flex: 1;
+            background: linear-gradient(180deg, rgba(252, 248, 239, 0.98), rgba(248, 243, 232, 0.98));
+            animation: riseIn 0.35s ease-out;
+        }
+
+        header {
+            padding: 1.1rem 1.4rem;
+            background: linear-gradient(90deg, var(--primary), var(--primary-soft));
+            color: #f8f4eb;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+        }
+
+        .logo-wrap {
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+        }
+
+        .seal {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #d9b97b 0%, #b08a4a 70%);
+            box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.35);
+        }
+
+        .logo {
+            font-size: 1.1rem;
+            letter-spacing: 0.04em;
+            font-weight: 700;
+        }
+
+        .subline {
+            font-size: 0.78rem;
+            opacity: 0.8;
+            margin-top: 0.08rem;
+            font-style: italic;
+        }
+
+        .header-right {
+            display: flex;
+            gap: 0.6rem;
+        }
+
+        .ghost-btn,
+        .primary-btn {
+            border: 1px solid transparent;
+            border-radius: 999px;
+            padding: 0.5rem 0.95rem;
+            font-family: inherit;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+        }
+
+        .ghost-btn {
+            background: rgba(255, 255, 255, 0.08);
+            color: #f4efe5;
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .ghost-btn:hover {
+            background: rgba(255, 255, 255, 0.18);
+            transform: translateY(-1px);
+        }
+
+        .primary-btn {
+            background: #f4ede0;
+            color: var(--primary);
+            border-color: rgba(255, 255, 255, 0.35);
+            font-weight: 700;
+        }
+
+        .primary-btn:hover {
+            transform: translateY(-1px);
+            background: #f9f5ec;
+        }
+
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            min-height: 0;
+        }
+
+        .messages {
+            flex: 1;
+            min-height: 0;
+            overflow-y: auto;
+            padding: 1.25rem 1.35rem 6.7rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.9rem;
+            scroll-behavior: smooth;
+        }
+
+        .messages::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        .messages::-webkit-scrollbar-thumb {
+            background: linear-gradient(var(--accent-soft), var(--accent));
+            border-radius: 10px;
+            border: 2px solid #f6f1e7;
+        }
+
+        .empty-state {
+            margin: auto;
+            text-align: center;
+            max-width: 640px;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        .empty-icon {
+            font-size: 2.1rem;
+            margin-bottom: 0.4rem;
+        }
+
+        .empty-state h2 {
+            font-size: clamp(1.5rem, 3.4vw, 2rem);
+            color: var(--primary);
+            margin-bottom: 0.45rem;
+        }
+
+        .empty-state p {
+            color: var(--muted);
+            line-height: 1.65;
+        }
+
+        .quick-questions {
+            margin-top: 1rem;
+            display: grid;
+            grid-template-columns: repeat(2, minmax(180px, 1fr));
+            gap: 0.55rem;
+        }
+
+        .quick-btn {
+            border: 1px solid var(--line);
+            background: #fbf7ee;
+            color: var(--primary-soft);
+            border-radius: 10px;
+            padding: 0.6rem 0.7rem;
+            font-family: inherit;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .quick-btn:hover {
+            background: #f6eeda;
+            border-color: var(--accent);
+            transform: translateY(-1px);
+        }
+
+        .message {
+            display: flex;
+            gap: 0.6rem;
+            animation: slideUp 0.25s ease-out;
+        }
+
+        .message.user {
+            justify-content: flex-end;
+        }
+
+        .message-content {
+            max-width: min(72ch, 76%);
+            padding: 0.78rem 0.95rem;
+            line-height: 1.6;
+            font-size: 0.95rem;
+            border-radius: 12px;
+            border: 1px solid transparent;
+            word-break: break-word;
+        }
+
+        .message.ai .message-content {
+            background: var(--ai-bubble);
+            color: #2c3b2f;
+            border-color: #e3d7c1;
+        }
+
+        .message.user .message-content {
+            background: var(--user-bubble);
+            color: #f8f4eb;
+            border-color: #385243;
+            border-radius: 12px 12px 4px 12px;
+        }
+
+        .avatar {
+            width: 28px;
+            height: 28px;
+            min-width: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 0.15rem;
+            font-size: 0.82rem;
+            border: 1px solid rgba(31, 58, 46, 0.22);
+            background: #efe6d6;
+            color: #2b3d31;
+        }
+
+        .message.user .avatar {
+            background: #2c4739;
+            color: #efe3cc;
+            border-color: #3a5a49;
+        }
+
+        .typing-indicator {
+            display: flex;
+            gap: 0.35rem;
+            align-items: center;
+            padding: 0.65rem 0.8rem;
+            background: #efe7d7;
+            border: 1px solid #ded0b8;
+            border-radius: 10px;
+        }
+
+        .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #8c7652;
+            animation: bounce 1.2s infinite;
+        }
+
+        .dot:nth-child(2) {
+            animation-delay: 0.15s;
+        }
+
+        .dot:nth-child(3) {
+            animation-delay: 0.3s;
+        }
+
+        .control {
+            display: flex;
+            flex-direction: column;
+            gap: 0.24rem;
+        }
+
+        .control label {
+            font-size: 0.73rem;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            color: var(--muted);
+            text-transform: uppercase;
+        }
+
+        .control select {
+            width: 100%;
+            background: #fffdfa;
+            border: 1px solid #d8c9ac;
+            border-radius: 8px;
+            color: var(--primary);
+            font-family: inherit;
+            font-size: 0.88rem;
+            padding: 0.5rem 0.55rem;
+            outline: none;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .control select:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(176, 138, 74, 0.14);
+        }
+
+        .input-section {
+            position: fixed;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 30;
+            padding: 0.75rem 1.25rem 0.95rem;
+            background: var(--paper);
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            border-top: 1px solid var(--line);
+            box-shadow: 0 -8px 24px rgba(62, 47, 28, 0.1);
+        }
+
+        .input-wrapper {
+            display: flex;
+            align-items: center;
+            flex: 1;
+            background: #fff;
+            border: 1px solid #d8c9ac;
+            border-radius: 999px;
+            padding: 0 0.95rem;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .input-wrapper:focus-within {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(176, 138, 74, 0.14);
+        }
+
+        .message-input {
+            width: 100%;
+            border: none;
+            background: transparent;
+            padding: 0.75rem 0;
+            font-size: 0.95rem;
+            color: var(--ink);
+            font-family: inherit;
+            outline: none;
+        }
+
+        .message-input::placeholder {
+            color: #8f887b;
+        }
+
+        .send-btn {
+            border: none;
+            border-radius: 999px;
+            min-width: 42px;
+            height: 42px;
+            padding: 0 0.9rem;
+            font-size: 1rem;
+            font-weight: 700;
+            background: linear-gradient(180deg, #2c4a3c, #1f3a2e);
+            color: #f8f4eb;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+            box-shadow: 0 8px 16px rgba(31, 58, 46, 0.22);
+        }
+
+        .send-btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .send-btn:disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes riseIn {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes bounce {
+            0%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-4px); }
+        }
+
+        @media (max-width: 768px) {
+            .page-shell {
+                min-height: 100vh;
+            }
+
+            .top-controls {
+                grid-template-columns: 1fr;
+                padding: 0.75rem 0.9rem;
+            }
+
+            .chat-shell {
+                min-height: 0;
+            }
+
+            header {
+                padding: 0.9rem 0.95rem;
+            }
+
+            .logo {
+                font-size: 1rem;
+            }
+
+            .subline {
+                display: none;
+            }
+
+            .ghost-btn,
+            .primary-btn {
+                padding: 0.45rem 0.7rem;
+                font-size: 0.78rem;
+            }
+
+            .messages {
+                padding: 1rem;
+            }
+
+            .messages {
+                padding-bottom: 6.8rem;
+            }
+
+            .message-content {
+                max-width: 87%;
+            }
+
+            .quick-questions {
+                grid-template-columns: 1fr;
+            }
+
+            .input-section {
+                padding: 0.65rem 0.9rem 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <main class="page-shell">
+        <section class="top-controls" aria-label="Study preferences">
+            <div class="control">
+                <label for="tradeYear">Select Trade + Year</label>
+                <select id="tradeYear" name="tradeYear">
+                    <option value="GCS - 2nd Year" selected>GCS - 2nd Year</option>
+                </select>
+            </div>
+            <div class="control">
+                <label for="teacher">Select Teacher</label>
+                <select id="teacher" name="teacher">
+                    <option value="Dr. Jagdeep Singh" selected>Dr. Jagdeep Singh</option>
+                </select>
+            </div>
+            <div class="control">
+                <label for="year">Year</label>
+                <select id="year" name="year">
+                    <option value="2nd Year" selected>2nd Year</option>
+                </select>
+            </div>
+            <div class="control">
+                <label for="exam">Which Exam Are You Preparing For</label>
+                <select id="exam" name="exam">
+                    <option value="Minor 1" selected>Minor 1</option>
+                    <option value="Minor 2">Minor 2</option>
+                    <option value="Quiz 1">Quiz 1</option>
+                    <option value="Quiz 2">Quiz 2</option>
+                    <option value="Other">Other</option>
+                </select>
+            </div>
+        </section>
+
+        <section class="chat-shell">
+        <header>
+            <div class="logo-wrap">
+                <div class="seal"></div>
+                <div>
+                    <div class="logo">SAIM Scholar Chat</div>
+                    <div class="subline">Classical interface, modern intelligence</div>
+                </div>
+            </div>
+            <div class="header-right">
+                <button class="ghost-btn" type="button">About</button>
+                <button class="primary-btn" type="button">Sign In</button>
+            </div>
+        </header>
+
+        <div class="chat-container">
+            <div class="messages" id="messages">
+                <div class="empty-state">
+                    <div class="empty-icon">🎓</div>
+                    <h2>Welcome to SAIM</h2>
+                    <p>Set your study profile below, then ask any question. The responses will stay aligned with your selected trade, teacher, year, and exam type.</p>
+
+                    <div class="quick-questions">
+                        <button class="quick-btn" onclick="sendMessage('Give me an important topic list for Minor 1.')">Important topics for Minor 1</button>
+                        <button class="quick-btn" onclick="sendMessage('Create a quick revision plan for Quiz 1.')">Revision plan for Quiz 1</button>
+                        <button class="quick-btn" onclick="sendMessage('Ask me 5 practice questions for Minor 2.')">Practice questions for Minor 2</button>
+                        <button class="quick-btn" onclick="sendMessage('Help me prepare for other exam type.')">Prep for Other exam</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="input-section">
+                <div class="input-wrapper">
+                    <input
+                        type="text"
+                        class="message-input"
+                        id="messageInput"
+                        placeholder="Ask your study question..."
+                        autocomplete="off"
+                    >
+                </div>
+                <button class="send-btn" id="sendBtn" onclick="sendMessage()" aria-label="Send message">Send</button>
+            </div>
+        </div>
+        </section>
+    </main>
+
+    <script>
+        const messagesContainer = document.getElementById('messages');
+        const messageInput = document.getElementById('messageInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const tradeYearSelect = document.getElementById('tradeYear');
+        const teacherSelect = document.getElementById('teacher');
+        const yearSelect = document.getElementById('year');
+        const examSelect = document.getElementById('exam');
+
+        let messages = [];
+        let hasInitialMessages = false;
+
+        window.addEventListener('load', () => {
+            const saved = localStorage.getItem('saimChat');
+            if (saved) {
+                messages = JSON.parse(saved);
+                renderMessages();
+                hasInitialMessages = true;
+            }
+        });
+
+        function sendMessage(text = null) {
+            const message = text || messageInput.value.trim();
+            
+            if (!message) return;
+
+            // Clear empty state
+            if (!hasInitialMessages) {
+                messagesContainer.innerHTML = '';
+                hasInitialMessages = true;
+            }
+
+            // Add user message
+            addMessage(message, 'user');
+            messageInput.value = '';
+            messageInput.focus();
+
+            // Save to localStorage
+            saveChat();
+
+            // Show typing indicator
+            showTypingIndicator();
+
+            setTimeout(() => {
+                removeTypingIndicator();
+                const response = generateResponse(message, getProfile());
+                addMessage(response, 'ai');
+                saveChat();
+            }, 700 + Math.random() * 500);
+        }
+
+        function getProfile() {
+            return {
+                tradeYear: tradeYearSelect.value,
+                teacher: teacherSelect.value,
+                year: yearSelect.value,
+                exam: examSelect.value
+            };
+        }
+
+        function addMessage(text, sender) {
+            const msgObj = { text, sender, timestamp: Date.now() };
+            messages.push(msgObj);
+
+            const messageEl = document.createElement('div');
+            messageEl.className = `message ${sender}`;
+            messageEl.style.animation = 'slideUp 0.4s ease-out';
+
+            if (sender === 'ai') {
+                messageEl.innerHTML = `
+                    <div class="avatar ai-avatar">🤖</div>
+                    <div class="message-content">${escapeHtml(text)}</div>
+                `;
+            } else {
+                messageEl.innerHTML = `
+                    <div class="message-content">${escapeHtml(text)}</div>
+                    <div class="avatar">👤</div>
+                `;
+            }
+
+            messagesContainer.appendChild(messageEl);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function showTypingIndicator() {
+            const typingEl = document.createElement('div');
+            typingEl.className = 'message ai';
+            typingEl.id = 'typingIndicator';
+            typingEl.innerHTML = `
+                <div class="avatar ai-avatar">🤖</div>
+                <div class="typing-indicator">
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                </div>
+            `;
+            messagesContainer.appendChild(typingEl);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function removeTypingIndicator() {
+            const typing = document.getElementById('typingIndicator');
+            if (typing) typing.remove();
+        }
+
+        function generateResponse(question, profile) {
+            const lower = question.toLowerCase();
+            const preface = `Profile: ${profile.tradeYear}, ${profile.year}, ${profile.teacher}, ${profile.exam}.`;
+
+            if (lower.includes('topic')) {
+                return `${preface} For ${profile.exam}, focus on fundamentals, repeated classroom problems, and one previous-year pattern set. I can generate a topic-by-topic checklist next.`;
+            }
+
+            if (lower.includes('revision')) {
+                return `${preface} Use a 3-cycle revision: quick concept pass, practice pass, and timed recall pass. I can now make you a day-wise revision schedule.`;
+            }
+
+            if (lower.includes('practice') || lower.includes('question')) {
+                return `${preface} Great choice. I can produce short, medium, and long answer practice questions with marking hints aligned to ${profile.exam}.`;
+            }
+
+            return `${preface} I am ready to help. Ask any concept, doubt, or exam preparation question and I will answer in a concise study-friendly format.`;
+        }
+
+        function saveChat() {
+            localStorage.setItem('saimChat', JSON.stringify(messages));
+        }
+
+        function renderMessages() {
+            messagesContainer.innerHTML = '';
+            messages.forEach(msg => {
+                const msgEl = document.createElement('div');
+                msgEl.className = `message ${msg.sender}`;
+                if (msg.sender === 'ai') {
+                    msgEl.innerHTML = `
+                        <div class="avatar ai-avatar">🤖</div>
+                        <div class="message-content">${escapeHtml(msg.text)}</div>
+                    `;
+                } else {
+                    msgEl.innerHTML = `
+                        <div class="message-content">${escapeHtml(msg.text)}</div>
+                        <div class="avatar">👤</div>
+                    `;
+                }
+                messagesContainer.appendChild(msgEl);
+            });
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function escapeHtml(text) {
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return text.replace(/[&<>"']/g, m => map[m]);
+        }
+
+        messageInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+
+        messageInput.addEventListener('input', () => {
+            sendBtn.disabled = !messageInput.value.trim();
+        });
+
+        sendBtn.disabled = true;
+    </script>
+</body>
+</html>
