@@ -237,7 +237,7 @@
       <section class="panel chat" aria-label="SAIM chat">
         <header class="chat-head">
           <h2>SAIM Chat</h2>
-          <small id="context">1st Year • Minor 1</small>
+          <small id="context">1st Year • Computer Science • Minor 1 • Prof. Sharma</small>
         </header>
 
         <div id="messages" class="messages">
@@ -260,13 +260,17 @@
       const context = document.getElementById("context");
       const year = document.getElementById("year");
       const exam = document.getElementById("exam");
+      const trade = document.getElementById("trade");
+      const teacher = document.getElementById("teacher");
 
       function updateContext() {
-        context.textContent = `${year.value} • ${exam.value}`;
+        context.textContent = `${year.value} • ${trade.value} • ${exam.value} • ${teacher.value}`;
       }
 
       year.addEventListener("change", updateContext);
+      trade.addEventListener("change", updateContext);
       exam.addEventListener("change", updateContext);
+      teacher.addEventListener("change", updateContext);
 
       function appendMessage(text, type) {
         const node = document.createElement("div");
