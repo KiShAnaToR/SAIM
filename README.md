@@ -53,7 +53,7 @@ Better quality than MiniLM with similar speed. Completely free and runs locally.
 
 ### Backend Framework — FastAPI (Python)
 
-Industry standard for ML model serving. Async support, automatic API documentation, and direct access to all Python ML libraries.
+Industry standard for the ML model serving. Async support, automatic API documentation, and direct access to allthe Python ML libraries.
 
 ### Frontend — React.js (Phase 1), React Native (Phase 2)
 
